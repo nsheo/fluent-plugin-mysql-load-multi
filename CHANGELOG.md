@@ -1,3 +1,8 @@
+# 0.0.3 (2020/12/10)
+fork project from https://github.com/fukuiretu/fluent-plugin-mysql-load
+
+test for multi worker 
+
 # 0.0.2 (2014/05/17)
 
 Features:

@@ -216,3 +216,6 @@ See [CHANGELOG.md](https://github.com/fukuiretu/fluent-plugin-mysql-load/blob/ma
 
 # Copyright
 Copyright:: Copyright (c) 2014- Fukui ReTu License:: Apache License, Version 2.0
+
+#fork this project is forked from https://github.com/fukuiretu/fluent-plugin-mysql-load
+
