@@ -17,15 +17,25 @@ module Fluent
       super
     end
 
-    config_param :host, :string, :default => 'localhost'
-    config_param :port, :integer, :default => 3306
-    config_param :username, :string, :default => 'root'
-    config_param :password, :string, :default => nil
-    config_param :database, :string, :default => nil
-    config_param :tablename, :string, :default => nil
-    config_param :key_names, :string, :default => nil
-    config_param :column_names, :string, :default => nil
-    config_param :encoding, :string, :default => 'utf8'
+    config_param :host, :string, :default => 'localhost', desc: "Database host."
+    config_param :port, :integer, :default => 3306, desc: "Database port."
+    config_param :username, :string, :default => 'root', desc: "Database name."
+    config_param :password, :string, :default => nil, desc: "Database user."
+    config_param :database, :string, :default => nil, desc: "Database password."
+    config_param :tablename, :string, :default => nil, desc: "Bulk insert table."
+    config_param :key_names, :string, :default => nil, desc: <<-DESC
+Value key names, ${time} is placeholder Time.at(time).strftime("%Y-%m-%d %H:%M:%S").
+DESC 
+    config_param :column_names, :string, :default => nil, desc: "Load insert column."
+    config_param :encoding, :string, :default => 'utf8', desc: "Encoding option."
+    config_param :sslkey, :string, default: nil, desc: "SSL key."
+    config_param :sslcert, :string, default: nil, desc: "SSL cert."
+    config_param :sslca, :string, default: nil, desc: "SSL CA."
+    config_param :sslcapath, :string, default: nil, desc: "SSL CA path."
+    config_param :sslcipher, :string, default: nil, desc: "SSL cipher."
+    config_param :sslverify, :bool, default: nil, desc: "SSL Verify Server Certificate."
+    config_param :transaction_isolation_level, :enum, list: [:read_uncommitted, :read_committed, :repeatable_read, :serializable], default: nil,
+                 desc: "Set transaction isolation level."
 
     def configure(conf)
       compat_parameters_convert(conf, :buffer, :inject)
@@ -99,6 +109,7 @@ module Fluent
       tmp.close
 
       conn = get_connection
+      conn.query("SET SESSION TRANSACTION ISOLATION LEVEL #{transaction_isolation_level}") if @transaction_isolation_level
       conn.query(QUERY_TEMPLATE % ([tmp.path, @tablename, @column_names]))
       conn.close
 
@@ -134,9 +145,28 @@ module Fluent
             :password => @password,
             :database => @database,
             :encoding => @encoding,
+            :sslkey => @sslkey,
+            :sslcert => @sslcert,
+            :sslca => @sslca,
+            :sslcapath => @sslcapath,
+            :sslcipher => @sslcipher,
+            :sslverify => @sslverify,
             :local_infile => true,
             :flags => Mysql2::Client::MULTI_STATEMENTS
           })
+    end
+  
+    def transaction_isolation_level
+      case @transaction_isolation_level
+      when :read_uncommitted
+        "READ UNCOMMITTED"
+      when :read_committed
+        "READ COMMITTED"
+      when :repeatable_read
+        "REPEATABLE READ"
+      when :serializable
+        "SERIALIZABLE"
+      end
     end
   end
 end
