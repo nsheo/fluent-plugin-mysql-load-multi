@@ -23,9 +23,7 @@ module Fluent
     config_param :password, :string, :default => nil, desc: "Database user."
     config_param :database, :string, :default => nil, desc: "Database password."
     config_param :tablename, :string, :default => nil, desc: "Bulk insert table."
-    config_param :key_names, :string, :default => nil, desc: <<-DESC
-Value key names, ${time} is placeholder Time.at(time).strftime("%Y-%m-%d %H:%M:%S").
-DESC 
+    config_param :key_names, :string, :default => nil, desc: "fleuntd target key, time can be override ${time}" 
     config_param :column_names, :string, :default => nil, desc: "Load insert column."
     config_param :encoding, :string, :default => 'utf8', desc: "Encoding option."
     config_param :sslkey, :string, default: nil, desc: "SSL key."
